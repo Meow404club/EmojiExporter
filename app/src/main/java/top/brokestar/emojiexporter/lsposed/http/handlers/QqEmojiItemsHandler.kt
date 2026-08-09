@@ -216,14 +216,41 @@ class QqEmojiItemsHandler(token: String) : BaseHandler(token) {
         } catch (e: Throwable) { Log.w(TAG, "triggerDownloadImage failed: ${e.message}"); false }
     }
 
-    /** 解密加密大图：读文件字节后做 XOR {0,1,0,1}（QQ SecurityUtile.codeEmosmKey，与 .emotionsm 同算法）。 */
+    /**
+     * 解密 .emotionsm 加密大图。
+     * QQ 的加密（SecurityUtile.codeEmosmKey={0,1,0,1}）只作用于 GIF 头：
+     *   - GIF header（13 字节：签名6 + 逻辑屏幕描述符7）
+     *   - 全局色表（项数由 offset 10 的 packed 字节决定：2^((packed&7)+1) 项，每项 3 字节）
+     * 之后的 LZW 数据流、扩展块、图像块均为明文，不做 XOR。
+     * 之前误对整个文件 XOR，导致头部解密成功但明文数据段反被破坏。
+     */
     private fun decryptFile(cl: ClassLoader, path: String): ByteArray? {
         return try {
             val raw = java.io.File(path).readBytes()
             if (raw.isEmpty()) return null
-            // SecurityUtile.codeEmosmKey = {0,1,0,1}，自反 XOR
+            // PNG（_aio 预览图等）不经加密，原样返回
+            if (raw.size > 4 && raw[0] == 0x89.toByte() && raw[1] == 0x50.toByte() &&
+                raw[2] == 0x4e.toByte() && raw[3] == 0x47.toByte()) return raw
+            // 仅 GIF 走加密解密
+            val isGif = raw.size > 6 &&
+                (String(raw, 0, 6) == "GIF89a" || String(raw, 0, 6) == "GIF87a")
+            // 注意：磁盘上的是密文，头部被 XOR 过，所以不能直接判 "GIF89a"
+            // 判密文头部特征：密文 GIF89a = {0x47,0x48,0x46,0x39,0x39,0x60}
+            val isEncGif = raw.size > 6 && raw[0] == 0x47.toByte() && raw[1] == 0x48.toByte() &&
+                raw[2] == 0x46.toByte() && raw[3] == 0x39.toByte()
+            if (isGif || (!isEncGif)) {
+                // 已是明文 GIF 或非 GIF，原样返回
+                return raw
+            }
+            // 加密 GIF：计算加密区长度 = 13(header) + 全局色表
+            val packed = raw[10].toInt() and 0xff
+            val hasGct = (packed and 0x80) != 0
+            val gctItems = if (hasGct) 1 shl ((packed and 0x07) + 1) else 0
+            val encLen = 13 + gctItems * 3
             val key = byteArrayOf(0, 1, 0, 1)
-            for (i in raw.indices) raw[i] = (raw[i].toInt() xor key[i % 4].toInt()).toByte()
+            for (i in 0 until minOf(encLen, raw.size)) {
+                raw[i] = (raw[i].toInt() xor key[i % 4].toInt()).toByte()
+            }
             raw
         } catch (e: Throwable) { Log.w(TAG, "decryptFile failed: ${e.message}"); null }
     }

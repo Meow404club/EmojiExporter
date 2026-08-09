@@ -9,9 +9,31 @@ package top.brokestar.emojiexporter.data
 object SecurityUtileCompat {
     private val codeEmosmKey = byteArrayOf(0, 1, 0, 1)
 
-    /** .emotionsm 文件 XOR 自反还原（EmotionsmFileStore 用） */
+    /**
+     * .emotionsm 文件还原（EmotionsmFileStore 用）。
+     * QQ 的加密只覆盖 GIF header(13字节) + 全局色表，LZW 数据流为明文。
+     * 全文件 XOR 会破坏明文数据段，故仅对头部加密区做 XOR。
+     * - PNG（_aio 预览图等）不经加密，原样返回。
+     * - 已是明文 GIF（头部 GIF89a）也不处理。
+     * - 密文 GIF 头部特征：47 48 46 39 39 60（GIF89a 逐字节 XOR {0,1,0,1}）。
+     */
     fun xorEmosm(bytes: ByteArray) {
-        for (i in bytes.indices) bytes[i] = (bytes[i].toInt() xor codeEmosmKey[i % 4].toInt()).toByte()
+        if (bytes.size < 13) return
+        // PNG 明文，跳过
+        if (bytes[0] == 0x89.toByte() && bytes[1] == 0x50.toByte()) return
+        // 已是明文 GIF，跳过
+        if (bytes.size >= 6 && String(bytes, 0, 6) in listOf("GIF89a", "GIF87a")) return
+        // 密文 GIF 头部特征检查
+        val isEncGif = bytes[0] == 0x47.toByte() && bytes[1] == 0x48.toByte() &&
+            bytes[2] == 0x46.toByte() && bytes[3] == 0x39.toByte()
+        if (!isEncGif) return
+        val packed = bytes[10].toInt() and 0xff
+        val hasGct = (packed and 0x80) != 0
+        val gctItems = if (hasGct) 1 shl ((packed and 0x07) + 1) else 0
+        val encLen = 13 + gctItems * 3
+        for (i in 0 until minOf(encLen, bytes.size)) {
+            bytes[i] = (bytes[i].toInt() xor codeEmosmKey[i % 4].toInt()).toByte()
+        }
     }
 
     /**

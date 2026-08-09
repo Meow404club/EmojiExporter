@@ -79,15 +79,31 @@ class ExportManager(private val ctx: Context) {
         return emptyList()
     }
 
-    /** 单张下载：hook(QQ下载解密) → CDN → 本地 XOR。 */
+    /** 单张下载：hook(QQ下载解密) → CDN → 本地 XOR。下载后按魔数校验，损坏则继续尝试下一条。 */
     private suspend fun downloadOne(epId: String, eId: String, dst: File): Boolean {
         // 1) hook image 端点（QQ 内部下载 + 解密，覆盖最广）
-        if (downloadHookImage(epId, eId, dst)) return true
+        if (downloadHookImage(epId, eId, dst) && isValidImage(dst)) return true
         // 2) CDN 公开直链
-        if (CdnDownloader.downloadBest(epId, eId, dst)) return true
+        if (CdnDownloader.downloadBest(epId, eId, dst) && isValidImage(dst)) return true
         // 3) 本地 .emotionsm XOR 还原
-        if (EmotionsmFileStore.exists(epId, eId) && EmotionsmFileStore.exportOne(epId, eId, dst)) return true
+        if (EmotionsmFileStore.exists(epId, eId) && EmotionsmFileStore.exportOne(epId, eId, dst) && isValidImage(dst)) return true
         return false
+    }
+
+    /** 校验文件是否为有效图片（GIF/PNG/JPEG 魔数），避免把 HTML 错误页/损坏数据当成功。 */
+    private fun isValidImage(f: File): Boolean {
+        if (!f.exists() || f.length() < 8) return false
+        return try {
+            val b = f.inputStream().use { it.readNBytes(8) }
+            // GIF87a / GIF89a
+            (b.size >= 6 && b[0] == 0x47.toByte() && b[1] == 0x49.toByte() && b[2] == 0x46.toByte()) ||
+            // PNG 89 50 4E 47
+            (b.size >= 4 && b[0] == 0x89.toByte() && b[1] == 0x50.toByte() && b[2] == 0x4e.toByte() && b[3] == 0x47.toByte()) ||
+            // JPEG FF D8 FF
+            (b.size >= 3 && b[0] == 0xff.toByte() && b[1] == 0xd8.toByte() && b[2] == 0xff.toByte()) ||
+            // WEBP 52 49 46 46 ... 57 45 42 50
+            (b.size >= 8 && b[0] == 0x52.toByte() && b[1] == 0x49.toByte() && b[4] == 0x57.toByte())
+        } catch (_: Exception) { false }
     }
 
     /** 从 hook /qq/emoticon/image 下载单张（QQ 内部下载+解密，返回明文图片）。 */

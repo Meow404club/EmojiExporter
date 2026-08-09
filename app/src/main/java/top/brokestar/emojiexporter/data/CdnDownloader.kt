@@ -19,11 +19,11 @@ object CdnDownloader {
     private val client = OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(20, TimeUnit.SECONDS).build()
 
     fun xydataUrl(epId: String) = XYDATA.replace("[epId]", epId)
+    /** 候选直链（按成功概率排序）。注意 BIG_ENC 是加密大图且常 404，已移除避免拿到错误页。 */
     fun urlsFor(epId: String, eId: String, bigW: Int = 320, bigH: Int = 320): List<String> = listOf(
         SMALL_GIF.replace("[epId]", epId).replace("[eId]", eId),
         SMALL_PNG.replace("[epId]", epId).replace("[eId]", eId),
         PREVIEW_126.replace("[eIdSub]", eId.take(2)).replace("[eId]", eId),
-        BIG_ENC.replace("[eIdSub]", eId.take(2)).replace("[eId]", eId).replace("[w]", bigW.toString()).replace("[h]", bigH.toString()),
     )
 
     suspend fun fetchXydata(epId: String): List<String> = withContext(Dispatchers.IO) {
