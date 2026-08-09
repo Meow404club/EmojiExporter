@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:fitsSystemWindows="true">
+
+    <!-- 顶栏：只放标题，不挤账号/刷新 -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorSurface"
+        app:title="表情包导出"
+        app:titleTextColor="?attr/colorOnSurface" />
+
+    <!-- 账号 + 刷新：独立一行，不再和顶栏挤一起 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:background="?attr/colorSurface">
+        <TextView android:id="@+id/tvUin"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="未检测到 QQ 账号"
+            android:ellipsize="middle"
+            android:singleLine="true"
+            android:textSize="13sp"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+        <Button android:id="@+id/btnRefresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="刷新"
+            android:minWidth="72dp"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <com.google.android.material.tabs.TabLayout android:id="@+id/tabs"
+        android:layout_width="match_parent" android:layout_height="wrap_content" />
+
+    <androidx.viewpager2.widget.ViewPager2 android:id="@+id/pager"
+        android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
+        android:clipToPadding="false" />
+</LinearLayout>

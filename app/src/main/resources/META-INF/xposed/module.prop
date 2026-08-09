@@ -1,0 +1,9 @@
+id=emojiexporter
+name=表情包导出
+version=1.0
+versionCode=1
+author=brokestar233
+description=已添加表情包 / 搜商城，复用 QQ 登录态走 UI 等价请求，导出走 CDN。作者：brokestar233
+minApiVersion=101
+targetApiVersion=102
+staticScope=true

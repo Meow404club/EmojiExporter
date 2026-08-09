@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 详情页：封面大图 + 名称 + 导出按钮 + 表情网格预览 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:fitsSystemWindows="true">
+
+    <!-- 顶部栏（由 AppCompatActivity 接管，不重复画顶栏） -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar" android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorSurface"
+        app:titleTextColor="?attr/colorOnSurface"
+        app:navigationIcon="?attr/homeAsUpIndicator" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- 封面 + 信息区：封面放大到 120dp，确保能看到 -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:padding="16dp">
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="120dp" android:layout_height="120dp"
+                    app:cardCornerRadius="16dp" app:cardElevation="2dp" android:layout_marginEnd="16dp">
+                    <ImageView android:id="@+id/ivCover"
+                        android:layout_width="match_parent" android:layout_height="match_parent"
+                        android:scaleType="centerCrop" android:src="@drawable/ic_emoji_placeholder" />
+                </com.google.android.material.card.MaterialCardView>
+                <LinearLayout android:layout_width="0dp" android:layout_weight="1"
+                    android:layout_height="wrap_content" android:orientation="vertical"
+                    android:layout_gravity="center_vertical">
+                    <TextView android:id="@+id/tvEpId" android:layout_width="match_parent"
+                        android:layout_height="wrap_content" android:textSize="13sp"
+                        android:textColor="?attr/colorOutline" />
+                    <TextView android:id="@+id/tvCount" android:layout_width="match_parent"
+                        android:layout_height="wrap_content" android:textSize="13sp"
+                        android:textColor="?attr/colorOutline" android:layout_marginTop="2dp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 导出按钮 -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnExportAll" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:text="导出全部"
+                android:layout_marginStart="16dp" android:layout_marginEnd="16dp"
+                app:icon="@android:drawable/stat_sys_download" />
+
+            <!-- 加载进度 -->
+            <ProgressBar android:id="@+id/progress" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:layout_gravity="center_horizontal"
+                android:padding="16dp" />
+
+            <!-- 表情网格 -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvEmojis" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:paddingStart="8dp"
+                android:paddingEnd="8dp" android:paddingBottom="24dp"
+                android:nestedScrollingEnabled="false" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

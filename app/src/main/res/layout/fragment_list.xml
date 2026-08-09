@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:clipToPadding="false">
+
+    <!-- 搜索条（已添加页隐藏整条） -->
+    <LinearLayout android:id="@+id/searchBar"
+        android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:padding="12dp" android:gravity="center_vertical">
+        <EditText android:id="@+id/etKeyword"
+            android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
+            android:hint="输入 epId 或关键词" android:inputType="text"
+            android:imeOptions="actionSearch" />
+        <Button android:id="@+id/btnGo"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="搜索/直达" android:minWidth="88dp" />
+    </LinearLayout>
+
+    <!-- 批量操作栏（多选时显示） -->
+    <LinearLayout android:id="@+id/batchBar"
+        android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:padding="8dp" android:gravity="center_vertical" android:visibility="gone"
+        android:background="?attr/colorSurfaceVariant">
+        <TextView android:id="@+id/tvSelected" android:layout_width="0dp" android:layout_weight="1"
+            android:layout_height="wrap_content" android:textSize="14sp"
+            android:textColor="?attr/colorOnSurface" android:paddingStart="8dp" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/btnSelectAll"
+            android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="全选"
+            style="@style/Widget.Material3.Button.TextButton" android:minWidth="0dp" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/btnBatchExport"
+            android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="批量导出"
+            style="@style/Widget.Material3.Button.TonalButton" android:minWidth="0dp" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/btnCancel"
+            android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="取消"
+            style="@style/Widget.Material3.Button.TextButton" android:minWidth="0dp" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView android:id="@+id/rv"
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:clipToPadding="false" android:paddingBottom="8dp" />
+</LinearLayout>

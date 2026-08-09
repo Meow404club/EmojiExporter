@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 表情/封面占位图（无 URL 或加载失败时显示） -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp" android:height="48dp"
+    android:viewportWidth="24" android:viewportHeight="24"
+    android:tint="?attr/colorControlNormal">
+    <path android:fillColor="@android:color/transparent"
+        android:strokeColor="?attr/colorControlNormal" android:strokeWidth="0.8"
+        android:pathData="M4,4 L20,4 L20,20 L4,20 Z" />
+    <path android:fillColor="?attr/colorControlNormal"
+        android:pathData="M8.5,11A1.5,1.5 0,0 1,8.5 8A1.5,1.5 0,0 1,8.5 11M15.5,11A1.5,1.5 0,0 1,15.5 8A1.5,1.5 0,0 1,15.5 11M12,17.5C14.33,17.5 16.31,16.04 17.11,14L6.89,14C7.69,16.04 9.67,17.5 12,17.5M12,2A10,10 0,0 0,2 12A10,10 0,0 0,12 22A10,10 0,0 0,22 12A10,10 0,0 0,12 2Z" />
+</vector>

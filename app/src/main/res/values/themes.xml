@@ -1,0 +1,4 @@
+<resources>
+    <!-- NoActionBar：每个 Activity 用自己的 MaterialToolbar，避免系统默认 ActionBar 叠加产生双顶栏 -->
+    <style name="Theme.EmojiExporter" parent="Theme.Material3.DayNight.NoActionBar" />
+</resources>
